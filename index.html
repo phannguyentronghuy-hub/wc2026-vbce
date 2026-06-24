@@ -1003,7 +1003,15 @@ function matchCardHtml(m) {
       <button class="${b1}" onclick="${canPick?`pick('${m.id}',1)`:''}" ${!canPick&&!myPick?'disabled':''}>${flagInline(m.t1)}${m.t1}</button>
       <button class="${b2}" onclick="${canPick?`pick('${m.id}',2)`:''}" ${!canPick&&!myPick?'disabled':''}>${flagInline(m.t2)}${m.t2}</button>
     </div>
-    ${myPick && canPick ? `<div class="tc" style="margin-top:6px"><button class="dd-btn${myDD?' dd-active':''}" onclick="toggleDD('${m.id}')">${myDD?'⚡ X2 ĐÃ BẬT':'⚡ X2 LIỀU ĂN NHIỀU'}</button></div>` : myDD && !canPick ? `<div class="tc" style="margin-top:6px"><span class="dd-badge">⚡ X2</span></div>` : ''}
+    ${(()=>{
+      if (!myPick || !ME) return '';
+      if (myDD && !canPick) return `<div class="tc" style="margin-top:6px"><span class="dd-badge">⚡ X2</span></div>`;
+      if (!canPick) return '';
+      const usedOn = ddUsedOnDate(ME.id, m.date, m.id);
+      if (myDD) return `<div class="tc" style="margin-top:6px"><button class="dd-btn dd-active" onclick="toggleDD('${m.id}')">⚡ X2 ĐÃ BẬT</button></div>`;
+      if (usedOn) return `<div class="tc" style="margin-top:6px"><button class="dd-btn" disabled style="opacity:.4;cursor:not-allowed">⚡ Đã dùng x2 trận #${usedOn.no||'?'} hôm nay</button></div>`;
+      return `<div class="tc" style="margin-top:6px"><button class="dd-btn" onclick="toggleDD('${m.id}')">⚡ X2 LIỀU ĂN NHIỀU</button></div>`;
+    })()}
     <div class="social-proof">
       ${(locked || hasResult)
         ? `<div style="display:flex;align-items:center;gap:8px">${t1Players.length?`<div class="avatar-stack">${t1Stack}</div><span class="social-text"><b style="color:var(--blue)">${t1Players.length}</b> chọn ${m.t1.split(' ')[0]}</span>`:'<span class="social-text">Chưa có lượt</span>'}</div>`
@@ -1034,6 +1042,15 @@ async function pick(matchId, p) {
   else refresh();
 }
 
+function ddUsedOnDate(pid, matchDate, excludeMatchId) {
+  if (!matchDate) return null;
+  return S.matches.find(m => {
+    if (m.id === excludeMatchId) return false;
+    if (!S.doubleDowns[`${m.id}_${pid}`]) return false;
+    return m.date === matchDate;
+  });
+}
+
 async function toggleDD(matchId) {
   if (!ME) return;
   const key = `${matchId}_${ME.id}`;
@@ -1045,6 +1062,10 @@ async function toggleDD(matchId) {
     MY_PIN = pin; localStorage.setItem(LS.pin,pin);
   }
   const newDD = !S.doubleDowns[key];
+  if (newDD) {
+    const usedOn = ddUsedOnDate(ME.id, m.date, matchId);
+    if (usedOn) { toast(`⚡ Đã dùng x2 cho trận #${usedOn.no||'?'} ngày này`); return; }
+  }
   if (newDD) S.doubleDowns[key] = true; else delete S.doubleDowns[key];
   renderCurrent();
   const r = await api({action:'setDD', matchId, playerId:ME.id, dd:newDD?1:0, pin:MY_PIN});
