@@ -484,7 +484,8 @@ function avatarHtml(name, cls='sm'){
 // ═══════════════════════════════════════════════════════════
 // CONFIG (per-device, localStorage)
 // ═══════════════════════════════════════════════════════════
-const LS={api:'vbce_api',pwd:'vbce_pwd',me:'vbce_me',pin:'vbce_pin'};
+const _NS = (location.pathname.match(/\/([^\/]+)\/?/)||[])[1] || 'vbce';
+const LS={api:_NS+'_api',pwd:_NS+'_pwd',me:_NS+'_me',pin:_NS+'_pin'};
 let API_URL = localStorage.getItem(LS.api) || '';
 let ADMIN_PWD = localStorage.getItem(LS.pwd)||'';
 let ME = (()=>{try{return JSON.parse(localStorage.getItem(LS.me)||'null')}catch{return null}})();
@@ -1088,13 +1089,12 @@ function showMatchDetail(matchId) {
   const myPickHere = ME ? S.predictions[`${m.id}_${ME.id}`] : null;
   const chip = (p,side)=>{
     let cls = side===1?'t1':side===2?'t2':'none';
-    let extra='';
+    const pdd = !!S.doubleDowns[`${m.id}_${p.id}`];
+    let extra = pdd ? ' ⚡' : '';
     if (hasR && side>0) {
-      const pdd = !!S.doubleDowns[`${m.id}_${p.id}`];
       const s = calcScore(side, m.result, m.stage, pdd);
       const w = STAGE_WEIGHT[m.stage]||1;
-      extra = s>=w?' ✓':s>0?' ½':' ✗';
-      if (pdd) extra += '⚡';
+      extra = (s>=w?' ✓':s>0?' ½':' ✗') + (pdd?' ⚡':'');
     }
     return `<span class="player-chip ${cls}">${avatarHtml(p.short,'xs')}${p.short}${extra}</span>`;
   };
@@ -1139,8 +1139,11 @@ function showMatchDetail(matchId) {
 function renderRanking() {
   const stats = allStats();
   const totalScore = stats.reduce((s,a)=>s+a.score,0);
-  const totalMaxScore = stats.reduce((s,a)=>s+a.maxScore,0);
+  const maxPerPlayer = S.matches.filter(m=>m.result!=null).reduce((s,m)=>s+(STAGE_WEIGHT[m.stage]||1),0);
+  const totalMaxScore = maxPerPlayer * stats.length;
   const totalLost = totalMaxScore - totalScore;
+  const lossRates = stats.map(s => maxPerPlayer > 0 ? (maxPerPlayer - s.score) / maxPerPlayer : 0);
+  const sumLossRates = lossRates.reduce((a,b)=>a+b, 0);
   const totalPlayed = stats.reduce((s,a)=>s+a.played,0);
   const now = new Date();
   const updateTime = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} ${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}`;
@@ -1210,7 +1213,7 @@ function renderRanking() {
         <div class="rank-money-lbl">Đúng</div>
       </div>
       <div class="rank-money">
-        <div class="rank-money-val" style="color:var(--red)">${totalLost>0?((s.maxScore-s.score)/totalLost*100).toFixed(1):'0'}%</div>
+        <div class="rank-money-val" style="color:var(--red)">${sumLossRates>0?(lossRates[i]/sumLossRates*100).toFixed(1):'0'}%</div>
         <div class="rank-money-lbl">%mất</div>
       </div>
     </div>`;
