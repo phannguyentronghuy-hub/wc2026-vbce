@@ -1324,8 +1324,107 @@ function renderAnalysis(stats) {
     <div id="prog-legend" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:8px"></div>
   </div>`;
 
+  // ── DISTRIBUTION CHARTS ──
+  h += renderDistributions(stats);
+
   // ── STREAK ANALYSIS ──
   h += renderStreaks(stats);
+
+  return h;
+}
+
+function renderDistributions(stats) {
+  const maxPerPlayer = S.matches.filter(m=>m.result!=null).reduce((s,m)=>s+(STAGE_WEIGHT[m.stage]||1),0);
+  if (!maxPerPlayer || stats.length < 2) return '';
+
+  const SVG_W = 480, BAR_H = 20, GAP = 5, PL = 70, PR = 60, PT = 10, PB = 5;
+  const n = stats.length;
+  const chartH = PT + n*(BAR_H+GAP) + PB;
+  const barArea = SVG_W - PL - PR;
+
+  // Sort by score descending
+  const byScore = [...stats].sort((a,b)=>b.score-a.score);
+  const maxScore = Math.max(...byScore.map(s=>s.score), 1);
+
+  // 1. Score distribution bar
+  let scoreBars = '';
+  byScore.forEach((s,i) => {
+    const y = PT + i*(BAR_H+GAP);
+    const earned = Math.max(s.score, 0);
+    const wEarned = (earned/maxPerPlayer)*barArea;
+    const wLost = ((maxPerPlayer-s.score)/maxPerPlayer)*barArea;
+    const isMe = ME?.id === s.pl.id;
+    scoreBars += `<text x="${PL-6}" y="${y+BAR_H/2+1}" text-anchor="end" fill="${isMe?'#ffca28':'rgba(255,255,255,.7)'}" font-size="10" font-weight="${isMe?'800':'600'}" font-family="Montserrat,sans-serif">${s.pl.short}</text>`;
+    scoreBars += `<rect x="${PL}" y="${y}" width="${wEarned}" height="${BAR_H}" rx="3" fill="#26d97f" opacity="${isMe?'1':'.7'}"/>`;
+    scoreBars += `<rect x="${PL+wEarned}" y="${y}" width="${wLost}" height="${BAR_H}" rx="0" fill="#ff5c7a" opacity="${isMe?'.4':'.2'}"/>`;
+    scoreBars += `<text x="${PL+barArea+6}" y="${y+BAR_H/2+1}" fill="rgba(255,255,255,.8)" font-size="10" font-weight="700" font-family="Montserrat,sans-serif">${s.score}/${maxPerPlayer}</text>`;
+    if (isMe) scoreBars += `<rect x="${PL-2}" y="${y-2}" width="${barArea+4}" height="${BAR_H+4}" rx="5" fill="none" stroke="#ffca28" stroke-width="1" stroke-dasharray="3,2"/>`;
+  });
+
+  // 2. Loss contribution pie data
+  const lossRates = stats.map(s => maxPerPlayer > 0 ? (maxPerPlayer - s.score) / maxPerPlayer : 0);
+  const sumLoss = lossRates.reduce((a,b)=>a+b,0);
+  const lossContrib = stats.map((s,i) => ({
+    pl: s.pl,
+    rate: lossRates[i],
+    pct: sumLoss > 0 ? lossRates[i]/sumLoss : 0,
+    lost: maxPerPlayer - s.score
+  })).sort((a,b)=>b.pct-a.pct);
+
+  // Loss contribution horizontal bar
+  const maxPct = Math.max(...lossContrib.map(c=>c.pct), 0.01);
+  let lossBars = '';
+  lossContrib.forEach((c,i) => {
+    const y = PT + i*(BAR_H+GAP);
+    const w = Math.max((c.pct/maxPct)*barArea, 2);
+    const isMe = ME?.id === c.pl.id;
+    const intensity = c.pct > 0.1 ? 1 : c.pct > 0.05 ? 0.7 : 0.4;
+    lossBars += `<text x="${PL-6}" y="${y+BAR_H/2+1}" text-anchor="end" fill="${isMe?'#ffca28':'rgba(255,255,255,.7)'}" font-size="10" font-weight="${isMe?'800':'600'}" font-family="Montserrat,sans-serif">${c.pl.short}</text>`;
+    lossBars += `<rect x="${PL}" y="${y}" width="${w}" height="${BAR_H}" rx="3" fill="#ff5c7a" opacity="${isMe?'1':intensity}"/>`;
+    lossBars += `<text x="${PL+w+6}" y="${y+BAR_H/2+1}" fill="rgba(255,255,255,.8)" font-size="10" font-weight="700" font-family="Montserrat,sans-serif">${(c.pct*100).toFixed(1)}%</text>`;
+    if (isMe) lossBars += `<rect x="${PL-2}" y="${y-2}" width="${w+4}" height="${BAR_H+4}" rx="5" fill="none" stroke="#ffca28" stroke-width="1" stroke-dasharray="3,2"/>`;
+  });
+
+  // 3. Outcome breakdown per player (stacked bar: win/half/miss as % of played)
+  const byPlayed = [...stats].sort((a,b)=>b.played-a.played);
+  let stackBars = '';
+  byPlayed.forEach((s,i) => {
+    const y = PT + i*(BAR_H+GAP);
+    const total = s.fullWin + s.halfWin + s.miss;
+    if (!total) return;
+    const wW = (s.fullWin/total)*barArea;
+    const wH = (s.halfWin/total)*barArea;
+    const wM = (s.miss/total)*barArea;
+    const isMe = ME?.id === s.pl.id;
+    stackBars += `<text x="${PL-6}" y="${y+BAR_H/2+1}" text-anchor="end" fill="${isMe?'#ffca28':'rgba(255,255,255,.7)'}" font-size="10" font-weight="${isMe?'800':'600'}" font-family="Montserrat,sans-serif">${s.pl.short}</text>`;
+    stackBars += `<rect x="${PL}" y="${y}" width="${wW}" height="${BAR_H}" rx="3" fill="#26d97f" opacity="${isMe?'1':'.7'}"/>`;
+    stackBars += `<rect x="${PL+wW}" y="${y}" width="${wH}" height="${BAR_H}" fill="#ffa726" opacity="${isMe?'1':'.5'}"/>`;
+    stackBars += `<rect x="${PL+wW+wH}" y="${y}" width="${wM}" height="${BAR_H}" rx="0" fill="#ff5c7a" opacity="${isMe?'1':'.4'}"/>`;
+    stackBars += `<text x="${PL+barArea+6}" y="${y+BAR_H/2+1}" fill="rgba(255,255,255,.7)" font-size="9" font-weight="600" font-family="Montserrat,sans-serif">${s.fullWin}W ${s.halfWin}H ${s.miss}L</text>`;
+    if (isMe) stackBars += `<rect x="${PL-2}" y="${y-2}" width="${barArea+4}" height="${BAR_H+4}" rx="5" fill="none" stroke="#ffca28" stroke-width="1" stroke-dasharray="3,2"/>`;
+  });
+
+  let h = `<div class="section-title">📊 Phân phối điểm số</div>`;
+
+  h += `<div class="card" style="overflow-x:auto">
+    <div style="font-size:.72rem;font-weight:800;color:var(--muted);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase">🟩 Điểm đạt vs 🟥 Điểm mất (trên tổng ${maxPerPlayer} điểm có thể)</div>
+    <svg viewBox="0 0 ${SVG_W} ${chartH}" width="100%" style="display:block">${scoreBars}</svg>
+  </div>`;
+
+  h += `<div class="card" style="overflow-x:auto">
+    <div style="font-size:.72rem;font-weight:800;color:var(--muted);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase">📉 % Góp vào tổng điểm mất</div>
+    <svg viewBox="0 0 ${SVG_W} ${chartH}" width="100%" style="display:block">${lossBars}</svg>
+  </div>`;
+
+  h += `<div class="card" style="overflow-x:auto">
+    <div style="font-size:.72rem;font-weight:800;color:var(--muted);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase">🎯 Phân bố kết quả: Đúng / Nửa đúng / Sai</div>
+    <div style="display:flex;gap:12px;margin-bottom:6px">
+      <span style="font-size:.6rem;font-weight:700;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#26d97f;display:inline-block"></span>Đúng</span>
+      <span style="font-size:.6rem;font-weight:700;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#ffa726;display:inline-block"></span>Nửa</span>
+      <span style="font-size:.6rem;font-weight:700;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#ff5c7a;display:inline-block"></span>Sai</span>
+    </div>
+    <svg viewBox="0 0 ${SVG_W} ${chartH}" width="100%" style="display:block">${stackBars}</svg>
+  </div>`;
 
   return h;
 }
