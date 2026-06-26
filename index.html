@@ -1412,8 +1412,8 @@ function renderDistributions(stats) {
 
   // 4. Histogram of win rate distribution
   const accPcts = stats.map(s => s.accuracy * 100);
-  const BIN_SIZE = 2;
-  const histBins = Array.from({length: 100/BIN_SIZE + 1}, (_,i) => i*BIN_SIZE);
+  const BIN_SIZE = 1, BIN_MIN = 30, BIN_MAX = 70;
+  const histBins = Array.from({length: (BIN_MAX-BIN_MIN)/BIN_SIZE + 1}, (_,i) => BIN_MIN + i*BIN_SIZE);
   const histCounts = histBins.slice(0,-1).map((_,i) => {
     const lo = histBins[i], hi = histBins[i+1];
     return accPcts.filter(v => i===histBins.length-2 ? v>=lo&&v<=hi : v>=lo&&v<hi).length;
