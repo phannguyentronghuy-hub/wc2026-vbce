@@ -604,6 +604,7 @@ async function initSheets() {
 // ═══════════════════════════════════════════════════════════
 function calcScore(pick, result, stage, isDD) {
   const w = STAGE_WEIGHT[stage]||1;
+  const isDraw = result === 0;
   let base;
   if (pick===1) {
     if (result>=0.5) base = w;
@@ -616,7 +617,8 @@ function calcScore(pick, result, stage, isDD) {
   }
   if (!isDD) return base;
   if (base === w) return w * 2;
-  if (base > 0) return w;
+  if (isDraw) return w * 0.5;
+  if (base > 0) return 0;
   return -w;
 }
 function playerStats(pid) {
