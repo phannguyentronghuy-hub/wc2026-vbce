@@ -1412,15 +1412,17 @@ function renderDistributions(stats) {
 
   // 4. Histogram of win rate distribution
   const accPcts = stats.map(s => s.accuracy * 100);
-  const histBins = [0,10,20,30,40,50,60,70,80,90,100];
+  const BIN_SIZE = 2;
+  const histBins = Array.from({length: 100/BIN_SIZE + 1}, (_,i) => i*BIN_SIZE);
   const histCounts = histBins.slice(0,-1).map((_,i) => {
     const lo = histBins[i], hi = histBins[i+1];
     return accPcts.filter(v => i===histBins.length-2 ? v>=lo&&v<=hi : v>=lo&&v<hi).length;
   });
   const histMax = Math.max(...histCounts, 1);
-  const HIST_W = 480, HIST_H = 160, HPL = 35, HPR = 10, HPT = 10, HPB = 30;
+  const HIST_W = 520, HIST_H = 160, HPL = 35, HPR = 10, HPT = 10, HPB = 30;
   const histBarArea = HIST_W - HPL - HPR;
-  const histBarW = histBarArea / histCounts.length - 3;
+  const histGap = 1;
+  const histBarW = (histBarArea - histGap * histCounts.length) / histCounts.length;
   const histChartH = HIST_H - HPT - HPB;
   const myAcc = ME ? (stats.find(s=>s.pl.id===ME.id)?.accuracy||0)*100 : -1;
 
@@ -1433,7 +1435,7 @@ function renderDistributions(stats) {
   }
   // Bars
   histCounts.forEach((c,i) => {
-    const x = HPL + i * (histBarW + 3);
+    const x = HPL + i * (histBarW + histGap);
     const bh = (c/histMax) * histChartH;
     const y = HPT + histChartH - bh;
     const lo = histBins[i], hi = histBins[i+1];
@@ -1441,7 +1443,7 @@ function renderDistributions(stats) {
     const color = isMeBin ? '#ffca28' : lo>=50 ? '#26d97f' : lo>=30 ? '#ffa726' : '#ff5c7a';
     histSvg += `<rect x="${x}" y="${y}" width="${histBarW}" height="${bh}" rx="3" fill="${color}" opacity="${isMeBin?'1':'.6'}"/>`;
     if (c > 0) histSvg += `<text x="${x+histBarW/2}" y="${y-4}" text-anchor="middle" fill="rgba(255,255,255,.8)" font-size="9" font-weight="700" font-family="Montserrat,sans-serif">${c}</text>`;
-    histSvg += `<text x="${x+histBarW/2}" y="${HIST_H-6}" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="8" font-family="Montserrat,sans-serif">${lo}-${hi}%</text>`;
+    if (lo % 10 === 0) histSvg += `<text x="${x}" y="${HIST_H-6}" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="8" font-family="Montserrat,sans-serif">${lo}%</text>`;
   });
   // Mean line
   const meanAcc = accPcts.reduce((a,b)=>a+b,0)/accPcts.length;
