@@ -1923,20 +1923,13 @@ function renderResults() {
     const t1cls = pick === 1 ? (isCorrect ? 'color:var(--green);font-weight:700' : 'color:var(--red);font-weight:700') : '';
     const t2cls = pick === 2 ? (isCorrect ? 'color:var(--green);font-weight:700' : 'color:var(--red);font-weight:700') : '';
 
-    cards += `<div style="background:var(--surface);border-radius:12px;padding:12px;border-left:3px solid ${borderColor}">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <span style="font-size:.7rem;color:var(--muted);font-weight:600">#${m.no} · ${STAGE_SHORT[m.stage]||m.stage}</span>
-        <span class="${ptsCls}" style="font-size:1rem;font-weight:800">${pts}</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-        <span style="font-size:.82rem;flex:1;${t1cls}">${m.f1} ${m.t1}</span>
-        <span style="font-size:.9rem;font-weight:700;color:var(--gold);min-width:40px;text-align:center">${scoreText}</span>
-        <span style="font-size:.82rem;flex:1;text-align:right;${t2cls}">${m.t2} ${m.f2}</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted)">
-        <span>⚖ ${hcOutcome}${m.handicap!==0?' ('+m.handicap+')':''}</span>
-        <span>Chọn: <b style="color:var(--text)">${pickText}</b>${isDD?' ⚡':''}</span>
-      </div>
+    cards += `<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-left:3px solid ${borderColor};background:var(--surface);border-radius:8px;font-size:.75rem">
+      <span style="color:var(--muted);min-width:22px;font-size:.65rem;font-weight:600">#${m.no}</span>
+      <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${t1cls}">${m.f1} ${m.t1}</span>
+      <span style="font-weight:700;color:var(--gold);min-width:32px;text-align:center">${scoreText}</span>
+      <span style="flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${t2cls}">${m.t2} ${m.f2}</span>
+      <span style="min-width:50px;text-align:right;color:var(--muted);font-size:.65rem">${pickText}${isDD?' ⚡':''}</span>
+      <span class="${ptsCls}" style="min-width:28px;text-align:right;font-weight:800">${pts}</span>
     </div>`;
   });
 
@@ -1960,7 +1953,7 @@ function renderResults() {
         <span style="color:var(--muted)">/ ${totalMax}</span>
         <span style="margin-left:auto;color:var(--blue);font-weight:600">${totalMax > 0 ? (totalPts / totalMax * 100).toFixed(1) : 0}%</span>
       </div>` : '<div class="txt-muted" style="margin-bottom:10px;font-size:.8rem">Chọn người chơi để xem chi tiết</div>'}
-      <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;flex-direction:column;gap:4px">
         ${cards || '<div class="tc txt-muted" style="padding:20px">Chưa có trận nào có kết quả</div>'}
       </div>
     </div>`;
