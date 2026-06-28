@@ -338,6 +338,8 @@ label{font-size:.7rem;color:var(--muted);margin-bottom:5px;display:block;font-we
 .empty .title{color:var(--text);font-weight:800;font-size:1rem;margin-bottom:4px}
 .tc{text-align:center}.mt8{margin-top:8px}.mt16{margin-top:16px}.mb8{margin-bottom:8px}
 .txt-muted{color:var(--muted);font-size:.78rem}
+.pos{color:var(--green)}.half{color:var(--orange)}.neg{color:var(--red)}.zero{color:var(--muted)}
+.res-win{color:var(--green);font-weight:600}.res-lose{color:var(--red)}
 .score-bar{height:5px;border-radius:3px;background:var(--border);overflow:hidden;margin-top:3px}
 .score-bar>div{height:100%;background:var(--primary-grad);border-radius:3px;transition:width .5s}
 
@@ -384,6 +386,7 @@ label{font-size:.7rem;color:var(--muted);margin-bottom:5px;display:block;font-we
 </div>
 <div id="page-ranking" class="page"><div id="ranking-content"></div></div>
 <div id="page-analysis" class="page"><div id="analysis-content"></div></div>
+<div id="page-results" class="page"><div id="results-content"></div></div>
 <div id="page-rules" class="page"><div id="rules-content"></div></div>
 <div id="page-admin" class="page"><div id="admin-content"></div></div>
 
@@ -406,6 +409,10 @@ label{font-size:.7rem;color:var(--muted);margin-bottom:5px;display:block;font-we
   <button class="nav-btn" onclick="showTab('analysis')">
     <svg viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16"/><path d="M18 12l-3 3-2-2-4 4"/></svg>
     Stats
+  </button>
+  <button class="nav-btn" onclick="showTab('results')">
+    <svg viewBox="0 0 24 24"><path d="M9 11H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1z"/><path d="M20 6h-5a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1z"/></svg>
+    Kết quả
   </button>
   <button class="nav-btn" onclick="showTab('rules')">
     <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
@@ -499,7 +506,7 @@ const STAGE_WEIGHT = { group:1, r32:2, r16:3, qf:3, sf:3, final:3 };
 const STAGE_LABEL = { group:'Group Stage', r32:'Round of 32', r16:'Round of 16', qf:'Quarter Final', sf:'Semi Final', final:'Final' };
 const STAGE_SHORT = { group:'Group', r32:'R32', r16:'R16', qf:'QF', sf:'SF', final:'Final' };
 let curTab = 'home';
-const tabs = ['home','matches','ranking','analysis','rules','admin'];
+const tabs = ['home','matches','ranking','analysis','results','rules','admin'];
 let busy = 0;
 let stageFilter = '';
 let statusFilter = 'pending'; // '', 'pending', 'done' — default to upcoming matches
@@ -555,6 +562,7 @@ function renderCurrent() {
   if (curTab==='matches')  renderMatches();
   if (curTab==='ranking')  renderRanking();
   if (curTab==='analysis') renderAnalysisTab();
+  if (curTab==='results')  renderResults();
   if (curTab==='rules')    renderRules();
   if (curTab==='admin')    renderAdmin();
 }
@@ -1860,6 +1868,102 @@ function renderStreaks(stats) {
 
   h += `</div></div>`;
   return h;
+}
+
+// ═══════════════════════════════════════════════════════════
+// RESULTS TABLE
+// ═══════════════════════════════════════════════════════════
+let resFilterPlayer = '';
+let resFilterStage = '';
+
+function renderResults() {
+  const scored = S.matches
+    .filter(m => m.result != null)
+    .map(m => ({ m, ms: matchStartMs(m) || 0 }))
+    .sort((a, b) => b.ms - a.ms);
+
+  const playerOpts = S.players.map(p =>
+    `<option value="${p.id}" ${resFilterPlayer===p.id?'selected':''}>${p.short}</option>`
+  ).join('');
+  const stageOpts = ['','group','r32','r16','qf','sf','final'].map(s =>
+    `<option value="${s}" ${resFilterStage===s?'selected':''}>${s?STAGE_SHORT[s]||s:'Tất cả vòng'}</option>`
+  ).join('');
+
+  const pid = resFilterPlayer || (ME ? ME.id : '');
+  const pl = S.players.find(p => p.id === pid);
+
+  let rows = '';
+  let totalPts = 0, totalMax = 0, count = 0;
+
+  scored.forEach(({ m }) => {
+    if (resFilterStage && m.stage !== resFilterStage) return;
+    const key = `${m.id}_${pid}`;
+    const pick = S.predictions[key];
+    const isDD = !!S.doubleDowns[key];
+    const w = STAGE_WEIGHT[m.stage] || 1;
+    const hasScore = m.score1 != null && m.score2 != null;
+    const scoreText = hasScore ? `${m.score1}-${m.score2}` : '';
+    const hcOutcome = m.result === 1 ? `${m.t1} thắng` : m.result === 0.5 ? `${m.t1} thắng ½` : m.result === 0 ? 'Hoà' : m.result === -0.5 ? `${m.t2} thắng ½` : `${m.t2} thắng`;
+
+    let pts = '-', ptsCls = 'txt-muted';
+    if (pick) {
+      const s = calcScore(pick, m.result, m.stage, isDD);
+      pts = (s >= 0 ? '+' : '') + s;
+      ptsCls = s >= w ? 'pos' : s > 0 ? 'half' : s < 0 ? 'neg' : 'zero';
+      totalPts += s;
+      totalMax += isDD ? w * 2 : w;
+      count++;
+    }
+
+    const pickText = pick === 1 ? m.t1 : pick === 2 ? m.t2 : '—';
+    const pickCls = !pick ? 'txt-muted' : (pick === 1 && m.result >= 0.5) || (pick === 2 && m.result <= -0.5) ? 'res-win' : 'res-lose';
+
+    rows += `<tr>
+      <td class="tc">#${m.no}</td>
+      <td>${STAGE_SHORT[m.stage] || m.stage}</td>
+      <td>${m.t1} vs ${m.t2}</td>
+      <td class="tc">${scoreText}</td>
+      <td>${hcOutcome}</td>
+      <td class="${pickCls}">${pickText}${isDD ? ' ⚡' : ''}</td>
+      <td class="tc ${ptsCls}" style="font-weight:700">${pts}</td>
+    </tr>`;
+  });
+
+  const el = document.getElementById('results-content');
+  el.innerHTML = `
+    <div class="section-title">📋 Bảng kết quả chi tiết</div>
+    <div class="card">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <select onchange="resFilterPlayer=this.value;renderResults()" style="flex:1;min-width:120px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:.8rem">
+          <option value="">-- Chọn người --</option>
+          ${playerOpts}
+        </select>
+        <select onchange="resFilterStage=this.value;renderResults()" style="flex:1;min-width:100px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:.8rem">
+          ${stageOpts}
+        </select>
+      </div>
+      ${pid && pl ? `<div style="margin-bottom:10px;font-size:.8rem;display:flex;gap:16px;flex-wrap:wrap">
+        <span style="font-weight:700">${pl.short}</span>
+        <span>Đã chấm: <b>${count}</b> trận</span>
+        <span style="color:var(--green)">Điểm: <b>${totalPts}</b></span>
+        <span style="color:var(--blue)">Tối đa: <b>${totalMax}</b></span>
+        <span style="color:var(--muted)">Chuẩn xác: <b>${totalMax > 0 ? (totalPts / totalMax * 100).toFixed(1) : 0}%</b></span>
+      </div>` : '<div class="txt-muted" style="margin-bottom:10px;font-size:.8rem">Chọn người chơi để xem chi tiết</div>'}
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:.75rem">
+          <thead><tr style="border-bottom:2px solid var(--border);text-align:left">
+            <th style="padding:6px 4px">#</th>
+            <th style="padding:6px 4px">Vòng</th>
+            <th style="padding:6px 4px">Trận</th>
+            <th style="padding:6px 4px;text-align:center">Tỉ số</th>
+            <th style="padding:6px 4px">KQ Kèo</th>
+            <th style="padding:6px 4px">Chọn</th>
+            <th style="padding:6px 4px;text-align:center">Điểm</th>
+          </tr></thead>
+          <tbody style="color:var(--text-2)">${rows || '<tr><td colspan="7" class="tc txt-muted" style="padding:20px">Chưa có trận nào có kết quả</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>`;
 }
 
 // ═══════════════════════════════════════════════════════════
