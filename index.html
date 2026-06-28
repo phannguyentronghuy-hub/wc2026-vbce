@@ -1892,7 +1892,7 @@ function renderResults() {
   const pid = resFilterPlayer || (ME ? ME.id : '');
   const pl = S.players.find(p => p.id === pid);
 
-  let rows = '';
+  let cards = '';
   let totalPts = 0, totalMax = 0, count = 0;
 
   scored.forEach(({ m }) => {
@@ -1902,31 +1902,42 @@ function renderResults() {
     const isDD = !!S.doubleDowns[key];
     const w = STAGE_WEIGHT[m.stage] || 1;
     const hasScore = m.score1 != null && m.score2 != null;
-    const scoreText = hasScore ? `${m.score1}-${m.score2}` : '';
+    const scoreText = hasScore ? `${m.score1} - ${m.score2}` : '';
     const hcOutcome = m.result === 1 ? `${m.t1} thắng` : m.result === 0.5 ? `${m.t1} thắng ½` : m.result === 0 ? 'Hoà' : m.result === -0.5 ? `${m.t2} thắng ½` : `${m.t2} thắng`;
 
-    let pts = '-', ptsCls = 'txt-muted';
+    let pts = '-', ptsCls = 'txt-muted', ptsVal = 0;
     if (pick) {
-      const s = calcScore(pick, m.result, m.stage, isDD);
-      pts = (s >= 0 ? '+' : '') + s;
-      ptsCls = s >= w ? 'pos' : s > 0 ? 'half' : s < 0 ? 'neg' : 'zero';
-      totalPts += s;
+      ptsVal = calcScore(pick, m.result, m.stage, isDD);
+      pts = (ptsVal >= 0 ? '+' : '') + ptsVal;
+      ptsCls = ptsVal >= w ? 'pos' : ptsVal > 0 ? 'half' : ptsVal < 0 ? 'neg' : 'zero';
+      totalPts += ptsVal;
       totalMax += isDD ? w * 2 : w;
       count++;
     }
 
     const pickText = pick === 1 ? m.t1 : pick === 2 ? m.t2 : '—';
-    const pickCls = !pick ? 'txt-muted' : (pick === 1 && m.result >= 0.5) || (pick === 2 && m.result <= -0.5) ? 'res-win' : 'res-lose';
+    const isCorrect = pick && ((pick === 1 && m.result >= 0.5) || (pick === 2 && m.result <= -0.5));
+    const isHalf = pick && ((pick === 1 && m.result === 0.5) || (pick === 2 && m.result === -0.5) || m.result === 0);
+    const borderColor = !pick ? 'var(--border)' : isCorrect && !isHalf ? 'var(--green)' : isHalf ? 'var(--orange)' : 'var(--red)';
 
-    rows += `<tr>
-      <td class="tc">#${m.no}</td>
-      <td>${STAGE_SHORT[m.stage] || m.stage}</td>
-      <td>${m.t1} vs ${m.t2}</td>
-      <td class="tc">${scoreText}</td>
-      <td>${hcOutcome}</td>
-      <td class="${pickCls}">${pickText}${isDD ? ' ⚡' : ''}</td>
-      <td class="tc ${ptsCls}" style="font-weight:700">${pts}</td>
-    </tr>`;
+    const t1cls = pick === 1 ? (isCorrect ? 'color:var(--green);font-weight:700' : 'color:var(--red);font-weight:700') : '';
+    const t2cls = pick === 2 ? (isCorrect ? 'color:var(--green);font-weight:700' : 'color:var(--red);font-weight:700') : '';
+
+    cards += `<div style="background:var(--surface);border-radius:12px;padding:12px;border-left:3px solid ${borderColor}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:.7rem;color:var(--muted);font-weight:600">#${m.no} · ${STAGE_SHORT[m.stage]||m.stage}</span>
+        <span class="${ptsCls}" style="font-size:1rem;font-weight:800">${pts}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span style="font-size:.82rem;flex:1;${t1cls}">${m.f1} ${m.t1}</span>
+        <span style="font-size:.9rem;font-weight:700;color:var(--gold);min-width:40px;text-align:center">${scoreText}</span>
+        <span style="font-size:.82rem;flex:1;text-align:right;${t2cls}">${m.t2} ${m.f2}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted)">
+        <span>⚖ ${hcOutcome}${m.handicap!==0?' ('+m.handicap+')':''}</span>
+        <span>Chọn: <b style="color:var(--text)">${pickText}</b>${isDD?' ⚡':''}</span>
+      </div>
+    </div>`;
   });
 
   const el = document.getElementById('results-content');
@@ -1942,26 +1953,15 @@ function renderResults() {
           ${stageOpts}
         </select>
       </div>
-      ${pid && pl ? `<div style="margin-bottom:10px;font-size:.8rem;display:flex;gap:16px;flex-wrap:wrap">
-        <span style="font-weight:700">${pl.short}</span>
-        <span>Đã chấm: <b>${count}</b> trận</span>
-        <span style="color:var(--green)">Điểm: <b>${totalPts}</b></span>
-        <span style="color:var(--blue)">Tối đa: <b>${totalMax}</b></span>
-        <span style="color:var(--muted)">Chuẩn xác: <b>${totalMax > 0 ? (totalPts / totalMax * 100).toFixed(1) : 0}%</b></span>
+      ${pid && pl ? `<div style="margin-bottom:12px;padding:10px 12px;border-radius:10px;background:var(--surface-2);display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:.8rem">
+        <span style="font-weight:700;font-size:.9rem">${pl.short}</span>
+        <span>${count} trận</span>
+        <span style="color:var(--green);font-weight:700">${totalPts} đ</span>
+        <span style="color:var(--muted)">/ ${totalMax}</span>
+        <span style="margin-left:auto;color:var(--blue);font-weight:600">${totalMax > 0 ? (totalPts / totalMax * 100).toFixed(1) : 0}%</span>
       </div>` : '<div class="txt-muted" style="margin-bottom:10px;font-size:.8rem">Chọn người chơi để xem chi tiết</div>'}
-      <div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse;font-size:.75rem">
-          <thead><tr style="border-bottom:2px solid var(--border);text-align:left">
-            <th style="padding:6px 4px">#</th>
-            <th style="padding:6px 4px">Vòng</th>
-            <th style="padding:6px 4px">Trận</th>
-            <th style="padding:6px 4px;text-align:center">Tỉ số</th>
-            <th style="padding:6px 4px">KQ Kèo</th>
-            <th style="padding:6px 4px">Chọn</th>
-            <th style="padding:6px 4px;text-align:center">Điểm</th>
-          </tr></thead>
-          <tbody style="color:var(--text-2)">${rows || '<tr><td colspan="7" class="tc txt-muted" style="padding:20px">Chưa có trận nào có kết quả</td></tr>'}</tbody>
-        </table>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${cards || '<div class="tc txt-muted" style="padding:20px">Chưa có trận nào có kết quả</div>'}
       </div>
     </div>`;
 }
