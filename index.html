@@ -1928,7 +1928,7 @@ function renderResults() {
       <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${t1cls}">${m.f1} ${m.t1}</span>
       <span style="font-weight:700;color:var(--gold);min-width:32px;text-align:center">${scoreText}</span>
       <span style="flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${t2cls}">${m.t2} ${m.f2}</span>
-      <span style="min-width:50px;text-align:right;color:var(--muted);font-size:.65rem">${pickText}${isDD?' ⚡':''}</span>
+      <span style="min-width:50px;text-align:right;color:var(--muted);font-size:.65rem">${pickText}${isDD?'<span style="color:#ffeb3b;text-shadow:0 0 4px rgba(255,235,59,.6);font-size:.8rem"> ⚡</span>':''}</span>
       <span class="${ptsCls}" style="min-width:28px;text-align:right;font-weight:800">${pts}</span>
     </div>`;
   });
