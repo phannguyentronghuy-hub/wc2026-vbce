@@ -1513,14 +1513,13 @@ function renderWLChart() {
     const results = scored.map(({ m }) => {
       const key = `${m.id}_${pid}`;
       const pick = S.predictions[key];
-      if (!pick) return { m, type: 'skip' };
-      const w = STAGE_WEIGHT[m.stage] || 1;
+      if (!pick) return { m, type: 'skip', pts: 0 };
       const s = calcScore(pick, m.result, m.stage, !!S.doubleDowns[key]);
-      if (s >= w) return { m, type: 'win' };
-      if (s > 0) return { m, type: 'half' };
-      return { m, type: 'loss' };
+      const type = s > 0 ? (s >= (STAGE_WEIGHT[m.stage]||1) ? 'win' : 'half') : s < 0 ? 'loss' : 'zero';
+      return { m, type, pts: s };
     });
 
+    const maxPts = Math.max(...results.map(r => Math.abs(r.pts)), 1);
     const nR = results.length;
     const barW = 16, gap = 3;
     const W = Math.max(480, 40 + nR * (barW + gap) + 20);
@@ -1535,20 +1534,20 @@ function renderWLChart() {
     const step = nR <= 20 ? 1 : nR <= 40 ? 2 : Math.ceil(nR / 20);
     results.forEach((r, i) => {
       const x = PL + i * (barW + gap);
-      const colors = { win: '#26d97f', half: '#ffa726', loss: '#ff5c7a', skip: 'rgba(255,255,255,.08)' };
+      const colors = { win: '#26d97f', half: '#ffa726', loss: '#ff5c7a', zero: '#ff5c7a', skip: 'rgba(255,255,255,.08)' };
       const color = colors[r.type];
-      if (r.type === 'win') {
-        const bh = halfH * 0.85;
-        svg += `<rect x="${x}" y="${midY - bh}" width="${barW}" height="${bh}" rx="3" fill="${color}"/>`;
-      } else if (r.type === 'half') {
-        const bh = halfH * 0.45;
-        svg += `<rect x="${x}" y="${midY - bh}" width="${barW}" height="${bh}" rx="3" fill="${color}"/>`;
-      } else if (r.type === 'loss') {
-        const bh = halfH * 0.85;
-        svg += `<rect x="${x}" y="${midY}" width="${barW}" height="${bh}" rx="3" fill="${color}"/>`;
-      } else {
+      if (r.type === 'skip') {
         const bh = halfH * 0.15;
         svg += `<rect x="${x}" y="${midY - bh/2}" width="${barW}" height="${bh}" rx="2" fill="${color}"/>`;
+      } else if (r.type === 'zero') {
+        const bh = Math.max(halfH * 0.18, 4);
+        svg += `<rect x="${x}" y="${midY}" width="${barW}" height="${bh}" rx="3" fill="${color}" opacity=".5"/>`;
+      } else if (r.pts > 0) {
+        const bh = (r.pts / maxPts) * halfH * 0.92;
+        svg += `<rect x="${x}" y="${midY - bh}" width="${barW}" height="${bh}" rx="3" fill="${color}"/>`;
+      } else {
+        const bh = (Math.abs(r.pts) / maxPts) * halfH * 0.92;
+        svg += `<rect x="${x}" y="${midY}" width="${barW}" height="${bh}" rx="3" fill="${color}"/>`;
       }
       if (i % step === 0) {
         svg += `<text x="${x + barW/2}" y="${H-4}" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="7" font-family="Montserrat,sans-serif">#${r.m.no}</text>`;
@@ -1557,7 +1556,7 @@ function renderWLChart() {
 
     const wins = results.filter(r => r.type === 'win').length;
     const halfs = results.filter(r => r.type === 'half').length;
-    const losses = results.filter(r => r.type === 'loss').length;
+    const losses = results.filter(r => r.type === 'loss' || r.type === 'zero').length;
     const skips = results.filter(r => r.type === 'skip').length;
 
     html += `<div style="${si > 0 ? 'margin-top:10px;padding-top:10px;border-top:1px solid var(--border-2)' : ''}">
