@@ -1311,8 +1311,7 @@ function renderAnalysis(stats) {
   // ── PROGRESSION + WIN/LOSS COMBINED ──
   h += `<div class="section-title">📉 Diễn biến điểm số & thứ hạng</div>`;
   h += `<div class="card">
-    <div style="font-size:.72rem;font-weight:800;color:var(--muted);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase">Chọn người chơi</div>
-    <div class="chip-grid" id="prog-chips"></div>
+    <div style="display:flex;gap:8px;margin-bottom:4px" id="prog-chips"></div>
     <div style="margin-top:14px;font-size:.65rem;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px">THẮNG / THUA TỪNG TRẬN</div>
     <div id="wl-chart" style="overflow-x:auto"></div>
     <div style="display:flex;gap:12px;margin-top:6px;margin-bottom:14px;justify-content:center">
@@ -1495,7 +1494,9 @@ const PROG_COLORS = ['#ff4081','#26d97f','#4ac3ff','#ffa726','#7e57c2','#ffca28'
 
 function renderWLChart() {
   const el = document.getElementById('wl-chart');
-  if (!el || !progSelected.length) return;
+  if (!el) return;
+  const activeProg = progSelected.filter(id => id && S.players.some(p=>p.id===id));
+  if (!activeProg.length) { el.innerHTML = '<div class="txt-muted tc" style="padding:14px">Chọn người chơi</div>'; return; }
 
   const scored = S.matches
     .filter(m => m.result != null)
@@ -1505,7 +1506,7 @@ function renderWLChart() {
   if (!scored.length) { el.innerHTML = '<div class="txt-muted tc" style="padding:14px">Chưa có trận nào có KQ</div>'; return; }
 
   let html = '';
-  progSelected.forEach((pid, si) => {
+  activeProg.forEach((pid, si) => {
     const pi = S.players.findIndex(p => p.id === pid);
     const pl = S.players[pi];
     const pColor = PROG_COLORS[pi % PROG_COLORS.length];
@@ -1523,7 +1524,7 @@ function renderWLChart() {
     const nR = results.length;
     const barW = 16, gap = 3;
     const W = Math.max(480, 40 + nR * (barW + gap) + 20);
-    const H = 110;
+    const H = 160;
     const PL = 25, PR = 10, PT = 8, PB = 22;
     const midY = PT + (H - PT - PB) / 2;
     const halfH = (H - PT - PB) / 2;
@@ -1570,27 +1571,21 @@ function renderWLChart() {
 
 function initProgChart() {
   const valid = progSelected.filter(id => S.players.some(p => p.id === id));
-  if (valid.length) { progSelected = valid; }
+  if (valid.length >= 2) { progSelected = valid.slice(0,2); }
   else if (!ME) {
     const top2 = allStats().slice(0,2).map(s=>s.pl.id);
-    progSelected = top2.length ? top2 : S.players.slice(0,2).map(p=>p.id);
+    progSelected = top2.length >= 2 ? top2 : S.players.slice(0,2).map(p=>p.id);
   } else {
-    progSelected = [ME.id];
     const top = allStats().find(s=>s.pl.id!==ME.id);
-    if (top) progSelected.push(top.pl.id);
+    progSelected = [ME.id, top ? top.pl.id : ''];
   }
+  while (progSelected.length < 2) progSelected.push('');
   renderProgChips();
   renderProgCharts();
 }
 
-function toggleProgPlayer(pid) {
-  const idx = progSelected.indexOf(pid);
-  if (idx >= 0) {
-    if (progSelected.length > 1) progSelected.splice(idx, 1);
-  } else {
-    if (progSelected.length >= 2) progSelected.shift();
-    progSelected.push(pid);
-  }
+function setProgPlayer(slot, pid) {
+  progSelected[slot] = pid;
   renderProgChips();
   renderProgCharts();
 }
@@ -1598,11 +1593,15 @@ function toggleProgPlayer(pid) {
 function renderProgChips() {
   const el = document.getElementById('prog-chips');
   if (!el) return;
-  el.innerHTML = S.players.map((p, i) => {
-    const active = progSelected.includes(p.id);
-    const color = PROG_COLORS[i % PROG_COLORS.length];
-    return `<span class="player-chip ${active?'':'none'}" style="${active?`background:${color}22;border-color:${color};color:${color}`:''}" onclick="toggleProgPlayer('${p.id}')">${avatarHtml(p.short,'xs')}${p.short}</span>`;
-  }).join('');
+  const dd = (slot) => {
+    const cur = progSelected[slot] || '';
+    const opts = S.players.map(p =>
+      `<option value="${p.id}" ${p.id===cur?'selected':''}>${p.short}</option>`
+    ).join('');
+    return `<select onchange="setProgPlayer(${slot},this.value)" style="flex:1;padding:7px 8px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:.78rem">
+      <option value="">-- Người ${slot+1} --</option>${opts}</select>`;
+  };
+  el.innerHTML = dd(0) + dd(1);
 }
 
 function buildProgData() {
@@ -1649,6 +1648,8 @@ function renderProgCharts() {
   const rankEl = document.getElementById('prog-rank-chart');
   const legendEl = document.getElementById('prog-legend');
   if (!scoreEl) return;
+  const activeProg = progSelected.filter(id => id && S.players.some(p=>p.id===id));
+  if (!activeProg.length) { scoreEl.innerHTML=''; rankEl.innerHTML=''; legendEl.innerHTML=''; return; }
 
   const data = buildProgData();
   if (!data || !data.rounds.length) {
@@ -1661,11 +1662,11 @@ function renderProgCharts() {
   const { cumScores, rounds, ranks } = data;
   const nR = rounds.length;
   const W = Math.max(480, nR * 32 + 80);
-  const H = 180;
+  const H = 260;
   const PL = 35, PR = 15, PT = 15, PB = 30;
   const cw = W - PL - PR, ch = H - PT - PB;
 
-  const maxScore = Math.max(...progSelected.map(pid => Math.max(...cumScores[pid])), 1);
+  const maxScore = Math.max(...activeProg.map(pid => Math.max(...cumScores[pid])), 1);
   const nPlayers = S.players.length;
 
   const xOf = (i) => PL + (nR > 1 ? (i / (nR - 1)) * cw : cw / 2);
@@ -1696,7 +1697,7 @@ function renderProgCharts() {
 
   // Score chart
   let scoreSvg = gridLines(maxScore, yScore) + xLabels();
-  progSelected.forEach((pid, si) => {
+  activeProg.forEach((pid, si) => {
     const pi = S.players.findIndex(p => p.id === pid);
     const color = PROG_COLORS[pi % PROG_COLORS.length];
     const pts = cumScores[pid].map((v, i) => `${xOf(i)},${yScore(v)}`).join(' ');
@@ -1724,7 +1725,7 @@ function renderProgCharts() {
   };
 
   let rankSvg = rankGridLines() + xLabels();
-  progSelected.forEach((pid, si) => {
+  activeProg.forEach((pid, si) => {
     const pi = S.players.findIndex(p => p.id === pid);
     const color = PROG_COLORS[pi % PROG_COLORS.length];
     const pts = ranks.map((rm, i) => `${xOf(i)},${yRank(rm[pid])}`).join(' ');
@@ -1740,7 +1741,7 @@ function renderProgCharts() {
   rankEl.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block">${rankSvg}</svg>`;
 
   // Legend
-  legendEl.innerHTML = progSelected.map(pid => {
+  legendEl.innerHTML = activeProg.map(pid => {
     const pi = S.players.findIndex(p => p.id === pid);
     const color = PROG_COLORS[pi % PROG_COLORS.length];
     const pl = S.players[pi];
