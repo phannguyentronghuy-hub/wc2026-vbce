@@ -1034,6 +1034,38 @@ function matchCardHtml(m) {
   </div>`;
 }
 
+function initSwipe() {
+  document.addEventListener('touchstart', function(e) {
+    const card = e.target.closest('.match-card');
+    if (!card) return;
+    card._swipe = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() };
+  }, { passive: true });
+  document.addEventListener('touchmove', function(e) {
+    const card = e.target.closest('.match-card');
+    if (!card || !card._swipe) return;
+    const dx = e.touches[0].clientX - card._swipe.x;
+    const dy = e.touches[0].clientY - card._swipe.y;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+      card.style.transform = `translateX(${dx * 0.3}px)`;
+      card.style.transition = 'none';
+    }
+  }, { passive: true });
+  document.addEventListener('touchend', function(e) {
+    const card = e.target.closest('.match-card');
+    if (!card || !card._swipe) return;
+    const dx = e.changedTouches[0].clientX - card._swipe.x;
+    const dy = e.changedTouches[0].clientY - card._swipe.y;
+    card.style.transition = 'transform .2s';
+    card.style.transform = '';
+    delete card._swipe;
+    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.7) return;
+    const mid = card.id.replace('m-', '');
+    if (dx < 0) pick(mid, 1);
+    else pick(mid, 2);
+  }, { passive: true });
+}
+initSwipe();
+
 async function pick(matchId, p) {
   if (!ME) { toast('⚠️ Chọn tên trước!'); showPlayerSelect(); return; }
   const m = S.matches.find(x=>x.id===matchId);
