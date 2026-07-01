@@ -3,24 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0c0e11">
+<meta name="theme-color" content="#f5f5f7">
 <title>VBCE WC 2026 · Cuộc thi dự đoán nội bộ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0c0e11; --bg-2:#111416;
-  --surface:rgba(25,28,31,.7); --surface-2:rgba(35,38,45,.6);
-  --primary-grad:linear-gradient(135deg,#ff4081,#7e57c2);
-  --pink:#ff4081; --purple:#7e57c2;
-  --gold:#ffca28; --gold-soft:rgba(255,202,40,.18);
-  --green:#26d97f; --red:#ff5c7a; --blue:#4ac3ff; --orange:#ffa726;
-  --text:#fff; --text-2:rgba(255,255,255,.78); --muted:rgba(255,255,255,.55);
-  --border:rgba(255,255,255,.10); --border-2:rgba(255,255,255,.06);
+  --bg:#f5f5f7; --bg-2:#eeeef0;
+  --surface:rgba(255,255,255,.85); --surface-2:rgba(240,240,245,.8);
+  --primary-grad:linear-gradient(135deg,#e91e63,#7e57c2);
+  --pink:#e91e63; --purple:#7e57c2;
+  --gold:#f9a825; --gold-soft:rgba(249,168,37,.15);
+  --green:#1b9e5a; --red:#d32f2f; --blue:#1976d2; --orange:#ef6c00;
+  --text:#1a1a1a; --text-2:rgba(0,0,0,.72); --muted:rgba(0,0,0,.45);
+  --border:rgba(0,0,0,.10); --border-2:rgba(0,0,0,.05);
   --blur:blur(16px);
-  --shadow-glow:0 8px 32px rgba(255,64,129,.25);
-  --shadow-card:0 4px 20px rgba(0,0,0,.4);
+  --shadow-glow:0 8px 32px rgba(233,30,99,.15);
+  --shadow-card:0 4px 20px rgba(0,0,0,.08);
   --safe-top:env(safe-area-inset-top,0);
   --safe-bot:env(safe-area-inset-bottom,0);
 }
@@ -28,9 +28,9 @@
 html,body{background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.4;-webkit-font-smoothing:antialiased}
 body{
   background:
-    radial-gradient(circle at 0% 0%, rgba(255,64,129,.12), transparent 40%),
-    radial-gradient(circle at 100% 100%, rgba(126,87,194,.14), transparent 40%),
-    radial-gradient(circle at 100% 0%, rgba(74,195,255,.08), transparent 35%),
+    radial-gradient(circle at 0% 0%, rgba(233,30,99,.06), transparent 40%),
+    radial-gradient(circle at 100% 100%, rgba(126,87,194,.06), transparent 40%),
+    radial-gradient(circle at 100% 0%, rgba(25,118,210,.04), transparent 35%),
     var(--bg);
   background-attachment:fixed;
   padding-bottom:calc(80px + var(--safe-bot));
@@ -41,7 +41,7 @@ button,input,select{font-family:inherit;color:inherit}
 .app-header{
   position:sticky;top:0;z-index:90;
   padding:calc(10px + var(--safe-top)) 16px 10px;
-  background:rgba(12,14,17,.65);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  background:rgba(245,245,247,.75);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
   border-bottom:1px solid var(--border-2);
   display:flex;align-items:center;justify-content:space-between;gap:10px
 }
@@ -54,7 +54,7 @@ button,input,select{font-family:inherit;color:inherit}
 .icon-btn{width:38px;height:38px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;backdrop-filter:var(--blur)}
 .icon-btn:hover{border-color:var(--pink);transform:translateY(-1px)}
 .icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
-.loader{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+.loader{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.15);border-top-color:var(--pink);border-radius:50%;animation:spin .8s linear infinite}
 .loader.hidden{display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
@@ -72,7 +72,7 @@ button,input,select{font-family:inherit;color:inherit}
   border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px;
   box-shadow:var(--shadow-card)
 }
-.card.hero{padding:24px 18px;text-align:center;border-color:rgba(255,255,255,.15);position:relative;overflow:hidden}
+.card.hero{padding:24px 18px;text-align:center;border-color:rgba(0,0,0,.08);position:relative;overflow:hidden}
 .card.hero::before{content:'';position:absolute;inset:-50% -10%;background:radial-gradient(circle,rgba(255,64,129,.18),transparent 60%);pointer-events:none}
 .card>*{position:relative}
 
@@ -140,7 +140,7 @@ button,input,select{font-family:inherit;color:inherit}
 
 /* ─── MATCH CARD ─── */
 .match-card{background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px;animation:pop .25s ease;transition:all .2s}
-.match-card:hover{border-color:rgba(255,255,255,.18);transform:translateY(-1px)}
+.match-card:hover{border-color:rgba(0,0,0,.12);transform:translateY(-1px)}
 .match-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px}
 .match-stage{font-size:.6rem;padding:4px 10px;border-radius:20px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);font-weight:800;letter-spacing:1px}
 .match-stage.s-group{background:rgba(38,217,127,.15);color:var(--green);border-color:rgba(38,217,127,.3)}
@@ -155,7 +155,7 @@ button,input,select{font-family:inherit;color:inherit}
 .match-datetime-sep{color:var(--border);font-size:.7rem}
 .match-vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;margin-bottom:12px}
 .team{text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
-.flag-circle{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.05);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 0 12px rgba(0,0,0,.3)}
+.flag-circle{width:60px;height:60px;border-radius:50%;background:rgba(0,0,0,.03);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 0 12px rgba(0,0,0,.3)}
 .flag-circle img{width:100%;height:100%;object-fit:cover}
 .flag-circle .fallback{font-size:.7rem;font-weight:800;color:var(--muted)}
 .team-name{font-size:.78rem;font-weight:700;color:var(--text);max-width:110px;line-height:1.2}
@@ -239,7 +239,7 @@ button,input,select{font-family:inherit;color:inherit}
 
 /* ─── TIER SHOWCASE (Rules) ─── */
 .tier-block{background:var(--surface);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:20px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden;transition:all .25s}
-.tier-block:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.18)}
+.tier-block:hover{transform:translateY(-1px);border-color:rgba(0,0,0,.12)}
 .tier-block::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--primary-grad)}
 .tier-block.vvip{border-color:rgba(255,202,40,.45);box-shadow:0 0 32px rgba(255,202,40,.18),inset 0 0 60px rgba(255,202,40,.06);padding:18px}
 .tier-block.vvip::before{background:linear-gradient(180deg,#ffe58a,#ffca28,#ffa726);width:6px;box-shadow:0 0 14px rgba(255,202,40,.6)}
@@ -280,7 +280,7 @@ button,input,select{font-family:inherit;color:inherit}
 /* Standard tier members */
 .tier-members{display:flex;flex-wrap:wrap;gap:7px;position:relative;z-index:1}
 .member-card{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;background:var(--surface-2);border:1px solid var(--border-2);border-radius:24px;font-size:.78rem;font-weight:700;color:var(--text-2);transition:all .15s;cursor:default}
-.member-card:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.22);color:var(--text)}
+.member-card:hover{transform:translateY(-1px);border-color:rgba(0,0,0,.15);color:var(--text)}
 .tier-block.n1 .member-card:hover{border-color:#26d97f}
 .tier-block.n2 .member-card:hover{border-color:#4ac3ff}
 .tier-block.n3 .member-card:hover{border-color:#b399e0}
@@ -326,7 +326,7 @@ label{font-size:.7rem;color:var(--muted);margin-bottom:5px;display:block;font-we
 .toast.show{opacity:1}
 
 /* ─── BOTTOM NAV ─── */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:95;padding:8px 8px calc(8px + var(--safe-bot));background:rgba(12,14,17,.85);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-top:1px solid var(--border);display:flex;justify-content:space-around;gap:4px}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:95;padding:8px 8px calc(8px + var(--safe-bot));background:rgba(245,245,247,.88);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-top:1px solid var(--border);display:flex;justify-content:space-around;gap:4px}
 .nav-btn{flex:1;padding:8px 4px;background:none;border:none;color:var(--muted);font-size:.6rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;border-radius:12px;transition:all .15s;min-height:44px}
 .nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2}
 .nav-btn.active{color:var(--gold)}
@@ -485,7 +485,7 @@ function avHash(s){let h=0;for(let i=0;i<(s||'').length;i++){h=(h*31+s.charCodeA
 function avBg(name){return AV_COLORS[avHash(name||'?')%AV_COLORS.length];}
 function avatarHtml(name, cls='sm'){
   const initial = (name||'?').trim()[0]?.toUpperCase()||'?';
-  return `<span class="avatar ${cls}" style="background:${avBg(name)};border-color:rgba(255,255,255,.2)">${initial}</span>`;
+  return `<span class="avatar ${cls}" style="background:${avBg(name)};border-color:rgba(0,0,0,.12)">${initial}</span>`;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1018,7 +1018,7 @@ function matchCardHtml(m) {
       if (!myPick || !ME) return '';
       if (myDD && !canPick) return `<div class="tc" style="margin-top:6px"><span class="dd-badge">⚡ X2</span></div>`;
       if (!canPick) return '';
-      const usedOn = ddUsedOnDate(ME.id, m.date, m.id);
+      const usedOn = ddUsedOnDate(ME.id, m.date, m.time, m.id);
       if (myDD) return `<div class="tc" style="margin-top:6px"><button class="dd-btn dd-active" onclick="toggleDD('${m.id}')">⚡ X2 ĐÃ BẬT</button></div>`;
       if (usedOn) return `<div class="tc" style="margin-top:6px"><button class="dd-btn" disabled style="opacity:.4;cursor:not-allowed">⚡ Đã dùng x2 trận #${usedOn.no||'?'} hôm nay</button></div>`;
       return `<div class="tc" style="margin-top:6px"><button class="dd-btn" onclick="toggleDD('${m.id}')">⚡ X2 LIỀU ĂN NHIỀU</button></div>`;
@@ -1053,12 +1053,21 @@ async function pick(matchId, p) {
   else refresh();
 }
 
-function ddUsedOnDate(pid, matchDate, excludeMatchId) {
+function ddDay(dateStr, timeStr) {
+  const [y,mo,d] = dateStr.split('-').map(Number);
+  const [h,mi] = (timeStr||'00:00').split(':').map(Number);
+  const dt = new Date(y, mo-1, d, h, mi);
+  if (h < 18) dt.setDate(dt.getDate() - 1);
+  return dt.toISOString().slice(0,10);
+}
+
+function ddUsedOnDate(pid, matchDate, matchTime, excludeMatchId) {
   if (!matchDate) return null;
+  const day = ddDay(matchDate, matchTime);
   return S.matches.find(m => {
     if (m.id === excludeMatchId) return false;
     if (!S.doubleDowns[`${m.id}_${pid}`]) return false;
-    return m.date === matchDate;
+    return ddDay(m.date, m.time) === day;
   });
 }
 
@@ -1074,7 +1083,7 @@ async function toggleDD(matchId) {
   }
   const newDD = !S.doubleDowns[key];
   if (newDD) {
-    const usedOn = ddUsedOnDate(ME.id, m.date, matchId);
+    const usedOn = ddUsedOnDate(ME.id, m.date, m.time, matchId);
     if (usedOn) { toast(`⚡ Đã dùng x2 cho trận #${usedOn.no||'?'} ngày này`); return; }
   }
   if (newDD) S.doubleDowns[key] = true; else delete S.doubleDowns[key];
@@ -1166,7 +1175,7 @@ function renderRanking() {
       <span style="color:var(--green);font-weight:700">✓ Đạt: ${totalScore} (${pct}%)</span>
       <span style="color:var(--red);font-weight:700">✗ Mất: ${totalLost} điểm</span>
     </div>
-    <div style="background:rgba(255,255,255,.08);border-radius:6px;height:6px;margin:4px 24px 8px;overflow:hidden"><div style="height:100%;border-radius:6px;background:var(--green);width:${pct}%"></div></div>
+    <div style="background:rgba(0,0,0,.06);border-radius:6px;height:6px;margin:4px 24px 8px;overflow:hidden"><div style="height:100%;border-radius:6px;background:var(--green);width:${pct}%"></div></div>
     <div class="fund-update">Cập nhật lúc ${updateTime} · ${totalPlayed} lượt dự đoán đã chấm</div>
   </div>`;
 
@@ -1260,9 +1269,9 @@ function renderAnalysis(stats) {
     const w = Math.max((pct / maxAcc) * barArea, 2);
     const color = pct >= 0.6 ? '#26d97f' : pct >= 0.4 ? '#4ac3ff' : pct >= 0.2 ? '#ffa726' : '#ff5c7a';
     const isMe = ME?.id === s.pl.id;
-    bars += `<text x="${PAD_L-6}" y="${y+BAR_H/2+1}" text-anchor="end" fill="${isMe?'#ffca28':'rgba(255,255,255,.7)'}" font-size="11" font-weight="${isMe?'800':'600'}" font-family="Montserrat,sans-serif">${s.pl.short}</text>`;
+    bars += `<text x="${PAD_L-6}" y="${y+BAR_H/2+1}" text-anchor="end" fill="${isMe?'#e91e63':'rgba(0,0,0,.6)'}" font-size="11" font-weight="${isMe?'800':'600'}" font-family="Montserrat,sans-serif">${s.pl.short}</text>`;
     bars += `<rect x="${PAD_L}" y="${y}" width="${w}" height="${BAR_H}" rx="4" fill="${color}" opacity="${isMe?'1':'.75'}"/>`;
-    bars += `<text x="${PAD_L+w+6}" y="${y+BAR_H/2+1}" fill="rgba(255,255,255,.85)" font-size="11" font-weight="700" font-family="Montserrat,sans-serif">${(pct*100).toFixed(0)}%</text>`;
+    bars += `<text x="${PAD_L+w+6}" y="${y+BAR_H/2+1}" fill="rgba(0,0,0,.75)" font-size="11" font-weight="700" font-family="Montserrat,sans-serif">${(pct*100).toFixed(0)}%</text>`;
     if (isMe) bars += `<rect x="${PAD_L-2}" y="${y-2}" width="${w+4}" height="${BAR_H+4}" rx="6" fill="none" stroke="#ffca28" stroke-width="1.5" stroke-dasharray="4,3"/>`;
   });
 
@@ -1287,12 +1296,12 @@ function renderAnalysis(stats) {
   // Donut + summary
   h += `<div class="card" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
     <svg viewBox="0 0 140 140" width="130" height="130" style="flex-shrink:0">
-      <circle cx="${cx}" cy="${cy}" r="${donutR}" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="${donutStroke}"/>
+      <circle cx="${cx}" cy="${cy}" r="${donutR}" fill="none" stroke="rgba(0,0,0,.06)" stroke-width="${donutStroke}"/>
       <circle cx="${cx}" cy="${cy}" r="${donutR}" fill="none" stroke="#26d97f" stroke-width="${donutStroke}" stroke-dasharray="${d1} ${donutCirc-d1}" stroke-dashoffset="${off1}" transform="rotate(-90 ${cx} ${cy})" stroke-linecap="round"/>
       <circle cx="${cx}" cy="${cy}" r="${donutR}" fill="none" stroke="#ffa726" stroke-width="${donutStroke}" stroke-dasharray="${d2} ${donutCirc-d2}" stroke-dashoffset="${off2}" transform="rotate(-90 ${cx} ${cy})"/>
       <circle cx="${cx}" cy="${cy}" r="${donutR}" fill="none" stroke="#ff5c7a" stroke-width="${donutStroke}" stroke-dasharray="${d3} ${donutCirc-d3}" stroke-dashoffset="${off3}" transform="rotate(-90 ${cx} ${cy})"/>
       <text x="${cx}" y="${cy-4}" text-anchor="middle" fill="#fff" font-size="18" font-weight="900" font-family="Montserrat,sans-serif">${(avgAcc*100).toFixed(0)}%</text>
-      <text x="${cx}" y="${cy+12}" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="8" font-weight="700" font-family="Montserrat,sans-serif">TB CHUẨN XÁC</text>
+      <text x="${cx}" y="${cy+12}" text-anchor="middle" fill="rgba(0,0,0,.4)" font-size="8" font-weight="700" font-family="Montserrat,sans-serif">TB CHUẨN XÁC</text>
     </svg>
     <div style="flex:1;min-width:140px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="width:10px;height:10px;border-radius:3px;background:#26d97f;display:inline-block"></span><span style="font-size:.78rem;font-weight:700">Đúng: <b style="color:var(--green)">${totFull}</b> (${totPlayed?(totFull/totPlayed*100).toFixed(0):0}%)</span></div>
@@ -1318,7 +1327,7 @@ function renderAnalysis(stats) {
       <span style="font-size:.6rem;font-weight:700;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#26d97f;display:inline-block"></span>Đúng</span>
       <span style="font-size:.6rem;font-weight:700;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#ffa726;display:inline-block"></span>Nửa đúng</span>
       <span style="font-size:.6rem;font-weight:700;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#ff5c7a;display:inline-block"></span>Sai</span>
-      <span style="font-size:.6rem;font-weight:700;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:rgba(255,255,255,.15);display:inline-block"></span>Bỏ</span>
+      <span style="font-size:.6rem;font-weight:700;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:rgba(0,0,0,.08);display:inline-block"></span>Bỏ</span>
     </div>
     <div style="border-top:1px solid var(--border-2);padding-top:14px">
       <div style="font-size:.65rem;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px">ĐIỂM TÍCH LŨY</div>
@@ -1361,10 +1370,10 @@ function renderDistributions(stats) {
     const wEarned = (earned/maxPerPlayer)*barArea;
     const wLost = ((maxPerPlayer-s.score)/maxPerPlayer)*barArea;
     const isMe = ME?.id === s.pl.id;
-    scoreBars += `<text x="${PL-6}" y="${y+BAR_H/2+1}" text-anchor="end" fill="${isMe?'#ffca28':'rgba(255,255,255,.7)'}" font-size="10" font-weight="${isMe?'800':'600'}" font-family="Montserrat,sans-serif">${s.pl.short}</text>`;
+    scoreBars += `<text x="${PL-6}" y="${y+BAR_H/2+1}" text-anchor="end" fill="${isMe?'#e91e63':'rgba(0,0,0,.6)'}" font-size="10" font-weight="${isMe?'800':'600'}" font-family="Montserrat,sans-serif">${s.pl.short}</text>`;
     scoreBars += `<rect x="${PL}" y="${y}" width="${wEarned}" height="${BAR_H}" rx="3" fill="#26d97f" opacity="${isMe?'1':'.7'}"/>`;
     scoreBars += `<rect x="${PL+wEarned}" y="${y}" width="${wLost}" height="${BAR_H}" rx="0" fill="#ff5c7a" opacity="${isMe?'.4':'.2'}"/>`;
-    scoreBars += `<text x="${PL+barArea+6}" y="${y+BAR_H/2+1}" fill="rgba(255,255,255,.8)" font-size="10" font-weight="700" font-family="Montserrat,sans-serif">${s.score}/${maxPerPlayer}</text>`;
+    scoreBars += `<text x="${PL+barArea+6}" y="${y+BAR_H/2+1}" fill="rgba(0,0,0,.7)" font-size="10" font-weight="700" font-family="Montserrat,sans-serif">${s.score}/${maxPerPlayer}</text>`;
     if (isMe) scoreBars += `<rect x="${PL-2}" y="${y-2}" width="${barArea+4}" height="${BAR_H+4}" rx="5" fill="none" stroke="#ffca28" stroke-width="1" stroke-dasharray="3,2"/>`;
   });
 
@@ -1386,9 +1395,9 @@ function renderDistributions(stats) {
     const w = Math.max((c.pct/maxPct)*barArea, 2);
     const isMe = ME?.id === c.pl.id;
     const intensity = c.pct > 0.1 ? 1 : c.pct > 0.05 ? 0.7 : 0.4;
-    lossBars += `<text x="${PL-6}" y="${y+BAR_H/2+1}" text-anchor="end" fill="${isMe?'#ffca28':'rgba(255,255,255,.7)'}" font-size="10" font-weight="${isMe?'800':'600'}" font-family="Montserrat,sans-serif">${c.pl.short}</text>`;
+    lossBars += `<text x="${PL-6}" y="${y+BAR_H/2+1}" text-anchor="end" fill="${isMe?'#e91e63':'rgba(0,0,0,.6)'}" font-size="10" font-weight="${isMe?'800':'600'}" font-family="Montserrat,sans-serif">${c.pl.short}</text>`;
     lossBars += `<rect x="${PL}" y="${y}" width="${w}" height="${BAR_H}" rx="3" fill="#ff5c7a" opacity="${isMe?'1':intensity}"/>`;
-    lossBars += `<text x="${PL+w+6}" y="${y+BAR_H/2+1}" fill="rgba(255,255,255,.8)" font-size="10" font-weight="700" font-family="Montserrat,sans-serif">${(c.pct*100).toFixed(1)}%</text>`;
+    lossBars += `<text x="${PL+w+6}" y="${y+BAR_H/2+1}" fill="rgba(0,0,0,.7)" font-size="10" font-weight="700" font-family="Montserrat,sans-serif">${(c.pct*100).toFixed(1)}%</text>`;
     if (isMe) lossBars += `<rect x="${PL-2}" y="${y-2}" width="${w+4}" height="${BAR_H+4}" rx="5" fill="none" stroke="#ffca28" stroke-width="1" stroke-dasharray="3,2"/>`;
   });
 
@@ -1406,14 +1415,14 @@ function renderDistributions(stats) {
     const wH = (s.halfWin/total)*barArea;
     const wM = (s.miss/total)*barArea;
     const isMe = ME?.id === s.pl.id;
-    stackBars += `<text x="${PL-6}" y="${y+BAR_H/2+1}" text-anchor="end" fill="${isMe?'#ffca28':'rgba(255,255,255,.7)'}" font-size="10" font-weight="${isMe?'800':'600'}" font-family="Montserrat,sans-serif">${s.pl.short}</text>`;
+    stackBars += `<text x="${PL-6}" y="${y+BAR_H/2+1}" text-anchor="end" fill="${isMe?'#e91e63':'rgba(0,0,0,.6)'}" font-size="10" font-weight="${isMe?'800':'600'}" font-family="Montserrat,sans-serif">${s.pl.short}</text>`;
     stackBars += `<rect x="${PL}" y="${y}" width="${wW}" height="${BAR_H}" rx="3" fill="#26d97f" opacity="${isMe?'1':'.7'}"/>`;
     if (wW > 28) stackBars += `<text x="${PL+wW/2}" y="${y+BAR_H/2+4}" text-anchor="middle" fill="#fff" font-size="8" font-weight="700" font-family="Montserrat,sans-serif">${pW}%</text>`;
     stackBars += `<rect x="${PL+wW}" y="${y}" width="${wH}" height="${BAR_H}" fill="#ffa726" opacity="${isMe?'1':'.5'}"/>`;
     if (wH > 28) stackBars += `<text x="${PL+wW+wH/2}" y="${y+BAR_H/2+4}" text-anchor="middle" fill="#fff" font-size="8" font-weight="700" font-family="Montserrat,sans-serif">${pH}%</text>`;
     stackBars += `<rect x="${PL+wW+wH}" y="${y}" width="${wM}" height="${BAR_H}" rx="0" fill="#ff5c7a" opacity="${isMe?'1':'.4'}"/>`;
     if (wM > 28) stackBars += `<text x="${PL+wW+wH+wM/2}" y="${y+BAR_H/2+4}" text-anchor="middle" fill="#fff" font-size="8" font-weight="700" font-family="Montserrat,sans-serif">${pM}%</text>`;
-    stackBars += `<text x="${PL+barArea+6}" y="${y+BAR_H/2+1}" fill="rgba(255,255,255,.7)" font-size="9" font-weight="600" font-family="Montserrat,sans-serif">${s.fullWin}W ${s.halfWin}H ${s.miss}L</text>`;
+    stackBars += `<text x="${PL+barArea+6}" y="${y+BAR_H/2+1}" fill="rgba(0,0,0,.6)" font-size="9" font-weight="600" font-family="Montserrat,sans-serif">${s.fullWin}W ${s.halfWin}H ${s.miss}L</text>`;
     if (isMe) stackBars += `<rect x="${PL-2}" y="${y-2}" width="${barArea+4}" height="${BAR_H+4}" rx="5" fill="none" stroke="#ffca28" stroke-width="1" stroke-dasharray="3,2"/>`;
   });
 
@@ -1437,8 +1446,8 @@ function renderDistributions(stats) {
   // Y axis lines
   for (let i=0;i<=histMax;i++) {
     const y = HPT + histChartH - (i/histMax)*histChartH;
-    histSvg += `<line x1="${HPL}" x2="${HIST_W-HPR}" y1="${y}" y2="${y}" stroke="rgba(255,255,255,.06)" stroke-width="0.5"/>`;
-    histSvg += `<text x="${HPL-6}" y="${y+3}" text-anchor="end" fill="rgba(255,255,255,.3)" font-size="9" font-family="Montserrat,sans-serif">${i}</text>`;
+    histSvg += `<line x1="${HPL}" x2="${HIST_W-HPR}" y1="${y}" y2="${y}" stroke="rgba(0,0,0,.04)" stroke-width="0.5"/>`;
+    histSvg += `<text x="${HPL-6}" y="${y+3}" text-anchor="end" fill="rgba(0,0,0,.25)" font-size="9" font-family="Montserrat,sans-serif">${i}</text>`;
   }
   // Bars
   histCounts.forEach((c,i) => {
@@ -1449,8 +1458,8 @@ function renderDistributions(stats) {
     const isMeBin = myAcc >= lo && (i===histCounts.length-1 ? myAcc<=hi : myAcc<hi);
     const color = isMeBin ? '#ffca28' : lo>=50 ? '#26d97f' : lo>=30 ? '#ffa726' : '#ff5c7a';
     histSvg += `<rect x="${x}" y="${y}" width="${histBarW}" height="${bh}" rx="3" fill="${color}" opacity="${isMeBin?'1':'.6'}"/>`;
-    if (c > 0) histSvg += `<text x="${x+histBarW/2}" y="${y-4}" text-anchor="middle" fill="rgba(255,255,255,.8)" font-size="9" font-weight="700" font-family="Montserrat,sans-serif">${c}</text>`;
-    if (lo % 10 === 0) histSvg += `<text x="${x}" y="${HIST_H-6}" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="8" font-family="Montserrat,sans-serif">${lo}%</text>`;
+    if (c > 0) histSvg += `<text x="${x+histBarW/2}" y="${y-4}" text-anchor="middle" fill="rgba(0,0,0,.7)" font-size="9" font-weight="700" font-family="Montserrat,sans-serif">${c}</text>`;
+    if (lo % 10 === 0) histSvg += `<text x="${x}" y="${HIST_H-6}" text-anchor="middle" fill="rgba(0,0,0,.35)" font-size="8" font-family="Montserrat,sans-serif">${lo}%</text>`;
   });
   // Mean line
   const meanAcc = accPcts.reduce((a,b)=>a+b,0)/accPcts.length;
@@ -1530,12 +1539,12 @@ function renderWLChart() {
     const halfH = (H - PT - PB) / 2;
 
     let svg = '';
-    svg += `<line x1="${PL}" x2="${W-PR}" y1="${midY}" y2="${midY}" stroke="rgba(255,255,255,.12)" stroke-width="1"/>`;
+    svg += `<line x1="${PL}" x2="${W-PR}" y1="${midY}" y2="${midY}" stroke="rgba(0,0,0,.08)" stroke-width="1"/>`;
 
     const step = nR <= 20 ? 1 : nR <= 40 ? 2 : Math.ceil(nR / 20);
     results.forEach((r, i) => {
       const x = PL + i * (barW + gap);
-      const colors = { win: '#26d97f', half: '#ffa726', loss: '#ff5c7a', zero: '#ff5c7a', skip: 'rgba(255,255,255,.08)' };
+      const colors = { win: '#26d97f', half: '#ffa726', loss: '#ff5c7a', zero: '#ff5c7a', skip: 'rgba(0,0,0,.06)' };
       const color = colors[r.type];
       if (r.type === 'skip') {
         const bh = halfH * 0.15;
@@ -1551,7 +1560,7 @@ function renderWLChart() {
         svg += `<rect x="${x}" y="${midY}" width="${barW}" height="${bh}" rx="3" fill="${color}"/>`;
       }
       if (i % step === 0) {
-        svg += `<text x="${x + barW/2}" y="${H-4}" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="7" font-family="Montserrat,sans-serif">#${r.m.no}</text>`;
+        svg += `<text x="${x + barW/2}" y="${H-4}" text-anchor="middle" fill="rgba(0,0,0,.25)" font-size="7" font-family="Montserrat,sans-serif">#${r.m.no}</text>`;
       }
     });
 
@@ -1679,8 +1688,8 @@ function renderProgCharts() {
     for (let i = 0; i <= steps; i++) {
       const val = Math.round((maxVal / steps) * i);
       const y = yFn(val);
-      g += `<line x1="${PL}" x2="${W-PR}" y1="${y}" y2="${y}" stroke="rgba(255,255,255,.06)" stroke-width="1"/>`;
-      g += `<text x="${PL-6}" y="${y+3}" text-anchor="end" fill="rgba(255,255,255,.35)" font-size="9" font-family="Montserrat,sans-serif">${val}</text>`;
+      g += `<line x1="${PL}" x2="${W-PR}" y1="${y}" y2="${y}" stroke="rgba(0,0,0,.04)" stroke-width="1"/>`;
+      g += `<text x="${PL-6}" y="${y+3}" text-anchor="end" fill="rgba(0,0,0,.3)" font-size="9" font-family="Montserrat,sans-serif">${val}</text>`;
     }
     return g;
   };
@@ -1690,7 +1699,7 @@ function renderProgCharts() {
     const step = nR <= 15 ? 1 : nR <= 30 ? 2 : Math.ceil(nR / 15);
     for (let i = 0; i < nR; i += step) {
       const x = xOf(i);
-      g += `<text x="${x}" y="${H-5}" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="8" font-family="Montserrat,sans-serif">#${rounds[i].no}</text>`;
+      g += `<text x="${x}" y="${H-5}" text-anchor="middle" fill="rgba(0,0,0,.35)" font-size="8" font-family="Montserrat,sans-serif">#${rounds[i].no}</text>`;
     }
     return g;
   };
@@ -1718,8 +1727,8 @@ function renderProgCharts() {
     const step = nPlayers <= 8 ? 1 : Math.ceil(nPlayers / 6);
     for (let r = 1; r <= nPlayers; r += step) {
       const y = yRank(r);
-      g += `<line x1="${PL}" x2="${W-PR}" y1="${y}" y2="${y}" stroke="rgba(255,255,255,.06)" stroke-width="1"/>`;
-      g += `<text x="${PL-6}" y="${y+3}" text-anchor="end" fill="rgba(255,255,255,.35)" font-size="9" font-family="Montserrat,sans-serif">#${r}</text>`;
+      g += `<line x1="${PL}" x2="${W-PR}" y1="${y}" y2="${y}" stroke="rgba(0,0,0,.04)" stroke-width="1"/>`;
+      g += `<text x="${PL-6}" y="${y+3}" text-anchor="end" fill="rgba(0,0,0,.3)" font-size="9" font-family="Montserrat,sans-serif">#${r}</text>`;
     }
     return g;
   };
@@ -1928,7 +1937,7 @@ function renderResults() {
       <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${t1cls}">${m.f1} ${m.t1}</span>
       <span style="font-weight:700;color:var(--gold);min-width:32px;text-align:center">${scoreText}</span>
       <span style="flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${t2cls}">${m.t2} ${m.f2}</span>
-      <span style="min-width:50px;text-align:right;color:var(--muted);font-size:.65rem">${pickText}${isDD?'<span style="color:#ffeb3b;text-shadow:0 0 4px rgba(255,235,59,.6);font-size:.8rem"> ⚡</span>':''}</span>
+      <span style="min-width:50px;text-align:right;color:var(--muted);font-size:.65rem">${pickText}${isDD?'<span style="color:#e91e63;text-shadow:0 0 4px rgba(233,30,99,.4);font-size:.8rem"> ⚡</span>':''}</span>
       <span class="${ptsCls}" style="min-width:28px;text-align:right;font-weight:800">${pts}</span>
     </div>`;
   });
